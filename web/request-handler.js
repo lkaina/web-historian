@@ -1,6 +1,7 @@
 var path = require('path');
 var fs = require('fs');
 var url = require('url');
+var httpGet = require('http-get');
 
 module.exports.datadir = path.join(__dirname, "../data/sites.txt"); // tests will need to override this.
 
@@ -31,9 +32,8 @@ module.exports.handleRequest = function (req, res) {
 };
 
 var makeGetReq = function(req, res) {
-  
+
   var staticFiles;
-  console.log(req.url);
   switch (req.url) {
     case '/':
       staticFiles = path.join(__dirname, "public/index.html");
@@ -69,15 +69,13 @@ var makePostReq = function(req, res) {
     data += chunk;
   });
   req.on("end", function(){
-    console.log(data);
-    fs.readFile(data, 'binary', function(err, site) {
-      if (!err) {
-        fs.appendFile('../data/sites.txt', data);
-        fs.appendFile('../data/sites.txt', '\n');
+    httpGet.head(data, function(err, result) {
+      if (!err){
+        fs.appendFile('../data/sites.txt', data+'\n');
         sendResponse(res, 'POST request received', 'text/plain', 201);
       } else {
-        sendResponse(res, 'Not a valid URL', 'text/plain', 201);
+        sendResponse(res, 'invalid URL', 'text/plain', 201);
       }
-    })
+    });
   });
 };
