@@ -2,10 +2,24 @@
 <html>
 <head>
   <link rel="stylesheet" type="text/css" href="styles.css" />
+  <script src="lib/jquery.min.js"></script>
 </head>
 <body>
   <form method="POST">
+    <label>Enter a URL to store:</label>
     <input type="input" name="url"></input>
+    <input type="submit" id="subButton"></input>
   </form>
+
+  <script>
+    $('#subButton').on('click', function(e) {
+      e.preventDefault();
+      $.ajax {
+
+      };
+
+    })
+  </script>
+
 </body>
 </html>
