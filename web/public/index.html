@@ -2,10 +2,46 @@
 <html>
 <head>
   <link rel="stylesheet" type="text/css" href="styles.css" />
+  <script src="../../bower_components/jquery/jquery.min.js"></script>
+  <script src="../../bower_components/underscore/underscore-min.js"></script>
 </head>
 <body>
+  <header>
+    <h1>Web Historian</h1>
+  </header>
   <form method="POST">
-    <input type="input" name="url"></input>
+    <input type="input" class = 'getUrl' name="url" placeholder="Enter URL"></input>
+    <button class="urlSubmit">Submit URL</button>
   </form>
+  <script>
+    $(document).on('ready', function(){
+      var serverUrl = 'http://127.0.0.1:8080';
+      $('.urlSubmit').on('click', function(e){
+        var url = $('.getUrl').val();
+        $('.getUrl').val('');
+        e.preventDefault();
+        $.ajax({
+          url: serverUrl,
+          type:'POST',
+          data: JSON.stringify(url),
+          dataType: 'json',
+          success: function(data) {
+            console.log('URL Sent', data);
+          }
+        });
+        $.ajax({
+          url: serverUrl,
+          type:'GET',
+          contentType: 'application/json',
+          success: function(data) {
+            console.log('Received Data', data);
+          },
+          error: function(){
+            console.log('ERROR: Data Not Received');
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html>

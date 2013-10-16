@@ -1,1 +1,5 @@
-www.google.com
+http://www.gizmodo.com/
+http://www.slickdeals.net/
+http://www.abc.com/
+http://www.engadget.com/
+http://www.yahoo.com/
