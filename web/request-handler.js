@@ -2,6 +2,7 @@ var path = require('path');
 var fs = require('fs');
 var url = require('url');
 var httpGet = require('http-get');
+var fileServer = require('./fileServer.js');
 
 module.exports.datadir = path.join(__dirname, "../data/sites.txt"); // tests will need to override this.
 
@@ -23,42 +24,10 @@ var sendResponse = function(res, object, contentType, statusCode) {
 module.exports.handleRequest = function (req, res) {
   switch (req.method) {
     case 'GET':
-      makeGetReq(req, res);
+      fileServer.serve(req,res);
       break;
     case 'POST':
       makePostReq(req, res);
-      break;
-  }
-};
-
-var makeGetReq = function(req, res) {
-
-  var staticFiles;
-  switch (req.url) {
-    case '/':
-      staticFiles = path.join(__dirname, "public/index.html");
-      fs.readFile(staticFiles, 'binary', function(err, site) {
-        if (!err){
-          sendResponse(res, site,'text/html');
-        } else {
-          console.log(err);
-        }
-      });
-      break;
-    case '/styles.css':
-      staticFiles = path.join(__dirname, "public/styles.css");
-      fs.readFile(staticFiles, 'binary', function(err, site){
-        sendResponse(res, site,'text/css');
-      });
-      break;
-    case '/lib/jquery.min.js':
-      staticFiles = path.join(__dirname, "public/lib/jquery.min.js");
-      fs.readFile(staticFiles, 'binary', function(err, site){
-        sendResponse(res, site,'text/javascript');
-      });
-      break;
-    default:
-      sendResponse(res, {}, 'text/plain', 404);
       break;
   }
 };
@@ -71,11 +40,31 @@ var makePostReq = function(req, res) {
   req.on("end", function(){
     httpGet.head(data, function(err, result) {
       if (!err){
-        fs.appendFile('../data/sites.txt', data+'\n');
-        sendResponse(res, 'POST request received', 'text/plain', 201);
+        if (!foundSites[data]) {
+          fs.appendFile('/Users/hackreactor/code/ryanmg/2013-09-web-historian/data/sites.txt', data+'\n');
+          sendResponse(res, 'POST request received', 'text/plain', 201);
+          foundSites[data] = true;
+        }
+        sendResponse(res, 'already logged', 'text/plain', 201);
       } else {
-        sendResponse(res, 'invalid URL', 'text/plain', 201);
+        sendResponse(res, 'invalid URL', 'text/plain', 404);
       }
     });
   });
 };
+
+var foundSites = {};
+fs.readFile('/Users/hackreactor/code/ryanmg/2013-09-web-historian/data/sites.txt', 'binary', function(err, data) {
+  if (err) {
+    fs.writeFile('/Users/hackreactor/code/ryanmg/2013-09-web-historian/data/sites.txt', "");
+  } else {
+    var fileData = data;
+    var lineData = fileData.split(/[\r\n]/);
+    for (var i = 0; i < lineData.length; i++) {
+      foundSites[lineData[i]] = true;
+    }
+  }
+
+});
+
+
