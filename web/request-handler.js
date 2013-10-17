@@ -66,5 +66,3 @@ fs.readFile('/Users/hackreactor/code/ryanmg/2013-09-web-historian/data/sites.txt
   }
 
 });
-
-
